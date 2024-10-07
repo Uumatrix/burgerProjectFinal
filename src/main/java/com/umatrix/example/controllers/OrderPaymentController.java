@@ -3,12 +3,12 @@ package com.umatrix.example.controllers;
 
 import com.umatrix.example.models.OrderPayment;
 import com.umatrix.example.service.OrderPaymentService;
-import com.umatrix.example.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,12 +21,9 @@ public class OrderPaymentController {
 
     private final OrderPaymentService orderPaymentService;
 
-    private final OrderService orderService;
-
     @Autowired
-    public OrderPaymentController(OrderPaymentService orderPaymentService, OrderService orderService) {
+    public OrderPaymentController(OrderPaymentService orderPaymentService) {
         this.orderPaymentService = orderPaymentService;
-        this.orderService = orderService;
     }
 
     @Operation(summary = "gets an order payments", description = "order is automatically created when order created")
@@ -39,12 +36,13 @@ public class OrderPaymentController {
         return orderPaymentService.findByOrderId(orderId);
     }
 
-    @Operation(summary = "gets all order payments", description = "order is automatically created when order created")
+    @Operation(summary = "gets all order payments", description = "only manager can use it, order is automatically created when order created")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "order retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "order not found")
     })
     @GetMapping("/getAll")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public List<OrderPayment> findAll() {
         return orderPaymentService.findAll();
     }

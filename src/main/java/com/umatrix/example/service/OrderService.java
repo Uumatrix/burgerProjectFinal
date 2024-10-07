@@ -34,7 +34,7 @@ public class OrderService {
     }
 
     public List<Order> findByUser(Long userId) {
-        return orderRepo.findOrdersByUserId(userId);
+        return orderRepo.findOrdersByUser_Id(userId);
     }
 
     public void delete(Long id) {

@@ -9,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -33,10 +32,12 @@ public class SecurityConfig {
 
     private final String[] WHITE_LIST = {
             //controller url
-            "/user/registerAsManager",
-            "/user/registerAsUser",
-            "/user/login",
-            "/user/test",
+            "/user/**",
+            "/food/**",
+            "/foodCategory/**",
+            "order/**",
+            "orderPayment/getByOrderId/{orderId}",
+            "orderItem/**",
             //swagger
             "/v3/api-docs/**",
             "/swagger-ui/**",

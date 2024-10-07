@@ -1,6 +1,7 @@
 package com.umatrix.example.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.umatrix.example.Base.BaseEntity;
 import com.umatrix.example.statics.UserRole;
 import jakarta.persistence.*;
@@ -25,4 +26,8 @@ public class Users extends BaseEntity {
     private double balance;
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+    @JsonIgnore
+    @Column(columnDefinition = "BYTEA")
+    @Basic(fetch = FetchType.LAZY)
+    private byte[] image;
 }

@@ -3,7 +3,6 @@ package com.umatrix.example.controllers;
 import com.umatrix.example.dto.LogInDto;
 import com.umatrix.example.dto.UserDto;
 import com.umatrix.example.exceptionHandling.CustomExceptions.UserAlreadyExists;
-import com.umatrix.example.exceptionHandling.CustomExceptions.UserNotFound;
 import com.umatrix.example.exceptionHandling.messageexception.ErrorResponse;
 import com.umatrix.example.mapstruct.UserMapper;
 import com.umatrix.example.models.Order;
@@ -19,11 +18,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -174,6 +176,45 @@ public class UserController {
         users.setBalance(balance);
         userService.updateUser(users);
         return ResponseEntity.status(HttpStatus.OK).body(users.getBalance());
+    }
+
+    @Operation(summary = "upload user image", description = "file must be image/jpeg, not larger than 2mb and not empty")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "user retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "user not found")
+    })
+    @PostMapping("/{userId}/uploadImage")
+    public ResponseEntity<String> uploadProfilePicture(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("File is empty");
+        }
+        if (!file.getContentType().equals("image/jpeg") && !file.getContentType().equals("image/png")) {
+            return ResponseEntity.badRequest().body("Invalid file type. Only JPEG or PNG allowed");
+        }
+        long maxFileSize = 2 * 1024 * 1024; // 2MB in bytes
+        if (file.getSize() > maxFileSize) {
+            return ResponseEntity.badRequest().body("File is too large. Maximum allowed size is 2MB");
+        }
+        try {
+            userService.uploadImage(userId, file.getBytes());
+            return ResponseEntity.ok("Profile picture uploaded successfully");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading picture");
+        }
+    }
+
+    @Operation(summary = "get user image")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "user retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "user not found")
+    })
+    @GetMapping("/{userId}/getImage")
+    public ResponseEntity<byte[]> getProfilePicture(@PathVariable Long userId) {
+        byte[] image = userService.getImage(userId);
+        if (image == null || image.length == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok().contentType( MediaType.IMAGE_JPEG).body(image);
     }
 
 }

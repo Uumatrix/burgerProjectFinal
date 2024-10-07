@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -69,15 +70,28 @@ public class OrderItemController {
         return orderItemService.findById(id);
     }
 
-    @Operation(summary = "gets all order items")
+    @Operation(summary = "gets all order items", description = "only manager can use it")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "order item retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "order item not found")
     })
     @GetMapping("/getAll")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public List<OrderItem> getAll() {
         return orderItemService.findAll();
+
+
+    }@Operation(summary = "gets all order items by order id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "order item retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "order item not found")
+    })
+    @GetMapping("/getAllByOrderId/{orderId}")
+    public List<OrderItem> getAllByOrderId(@PathVariable long orderId) {
+        return orderItemService.findAllByOrderId(orderId);
     }
+
+
 
     @Operation(summary = "updates an order item")
     @ApiResponses(value = {
@@ -88,7 +102,7 @@ public class OrderItemController {
     public OrderItem update(@PathVariable Long id, @Valid @RequestBody OrderItemDto orderItemDto) {
         OrderItem orderItem = orderItemService.findById(id);
         Food food = foodService.findById(orderItemDto.getFoodId());
-        double totalPrice = orderItem.getQuantity() * food.getPrice();
+        double totalPrice = orderItemDto.getQuantity() * food.getPrice();
         Order order = orderService.findById(orderItemDto.getOrderId());
         orderItem.setTotalPrice(totalPrice);
         orderItem.setFood(food);

@@ -1,6 +1,7 @@
 package com.umatrix.example.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.umatrix.example.Base.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -26,6 +27,10 @@ public class Food extends BaseEntity {
     private double weight;
     @NotBlank(message = "composition must not be blank, null or empty")
     private String composition;
+    @JsonIgnore
+    @Basic(fetch = FetchType.LAZY)
+    @Column(columnDefinition = "BYTEA")
+    private byte[] image;
     @ManyToOne
     private FoodCategory category;
 

@@ -7,12 +7,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface OrderItemMapper {
 
     OrderItemMapper INSTANCE = Mappers.getMapper(OrderItemMapper.class);
 
-    @Mapping(target = "quantity", source = "orderItemDto.quantity")
+    //@Mapping(target = "quantity", source = "orderItemDto.quantity")
     OrderItem toOrderItem(OrderItemDto orderItemDto);
 
     OrderItemDto toOrderItemDto(OrderItem orderItem);

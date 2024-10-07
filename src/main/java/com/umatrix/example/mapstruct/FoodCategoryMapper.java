@@ -7,12 +7,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface FoodCategoryMapper {
 
     FoodCategoryMapper INSTANCE =  Mappers.getMapper(FoodCategoryMapper.class);
 
-    @Mapping(target = "name", source = "foodCategoryDto.name")
+    //@Mapping(target = "name", source = "foodCategoryDto.name")
     FoodCategory toFoodCategory(FoodCategoryDto foodCategoryDto);
 
 

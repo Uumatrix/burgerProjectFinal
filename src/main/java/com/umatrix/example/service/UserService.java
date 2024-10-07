@@ -12,7 +12,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,6 +81,18 @@ public class UserService {
             } catch (Exception ignore) {
             }
         }
+    }
+
+    @Transactional
+    public void uploadImage(Long userId, byte[] file) {
+        Users user = getUserById(userId);
+        user.setImage(file);
+        userRepo.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] getImage(Long userId) {
+        return getUserById(userId).getImage();
     }
 
 }
